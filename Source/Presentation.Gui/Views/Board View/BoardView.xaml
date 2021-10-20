@@ -1,0 +1,322 @@
+﻿<UserControl x:Class="CatanBoardGame.Presentation.Gui.Views.BoardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:auxConverters="clr-namespace:Auxilia.Presentation.Converters;assembly=Auxilia.Presentation.Core"
+             xmlns:converters="clr-namespace:CatanBoardGame.Presentation.Gui.Converters"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:domain="clr-namespace:CatanBoardGame;assembly=CatanBoardGame.Domain"
+             xmlns:geometry="clr-namespace:CatanBoardGame.Presentation.Gui.Geometry"
+             xmlns:hex="clr-namespace:Ludumia.Grids.Hexagonal;assembly=Ludumia.Grids.Hexagonal"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:models="clr-namespace:CatanBoardGame.Presentation.Gui.Models"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:views="clr-namespace:CatanBoardGame.Presentation.Gui.Views"
+             d:DataContext="{StaticResource DesignBoardViewModel}"
+             mc:Ignorable="d">
+	<UserControl.Resources>
+		<sys:Double x:Key="EdgeThickness">1</sys:Double>
+		<sys:Double x:Key="BackgroundSize">5.5</sys:Double>
+
+		<sys:Double x:Key="TileSize">100</sys:Double>
+		<sys:Double x:Key="RoadWidth">10</sys:Double>
+		<sys:Double x:Key="VillageSize">20</sys:Double>
+		<sys:Double x:Key="CitySize">30</sys:Double>
+
+		<sys:Double x:Key="ProductionNumberSize">15</sys:Double>
+		<sys:Double x:Key="ProductionNumberFontSize">12</sys:Double>
+		<sys:Double x:Key="ProductionNumberYieldFactor">0.3</sys:Double>
+	</UserControl.Resources>
+
+	<Grid Width="{Binding Width, RelativeSource={RelativeSource AncestorType={x:Type views:BoardView}}}"
+	      Height="{Binding Height, RelativeSource={RelativeSource AncestorType={x:Type views:BoardView}}}"
+	      HorizontalAlignment="Center"
+	      VerticalAlignment="Center">
+
+		<ItemsControl>
+			<ItemsControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<Canvas ClipToBounds="False"/>
+				</ItemsPanelTemplate>
+			</ItemsControl.ItemsPanel>
+
+			<ItemsControl.Items>
+				<Path VerticalAlignment="Center"
+				      Data="{x:Static hex:HexagonGeometry.Geometry}"
+				      Fill="{Binding Sea, Source={StaticResource ResourceToBrushConverter}}">
+					<Path.RenderTransform>
+						<TransformGroup>
+							<TranslateTransform/>
+							<RotateTransform Angle="30"/>
+							<ScaleTransform ScaleX="{StaticResource TileSize}" ScaleY="{StaticResource TileSize}"/>
+							<ScaleTransform ScaleX="{StaticResource BackgroundSize}" ScaleY="{StaticResource BackgroundSize}"/>
+						</TransformGroup>
+					</Path.RenderTransform>
+				</Path>
+			</ItemsControl.Items>
+		</ItemsControl>
+
+		<ItemsControl x:Name="BoardCanvas"
+		              ItemsSource="{Binding GameObjects}">
+			<ItemsControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<Canvas ClipToBounds="False"/>
+				</ItemsPanelTemplate>
+			</ItemsControl.ItemsPanel>
+		</ItemsControl>
+
+		<Grid.RenderTransform>
+			<TransformGroup>
+				<ScaleTransform ScaleX="{Binding Scale, RelativeSource={RelativeSource AncestorType={x:Type views:BoardView}}}" ScaleY="{Binding Scale, RelativeSource={RelativeSource AncestorType={x:Type views:BoardView}}}"/>
+			</TransformGroup>
+		</Grid.RenderTransform>
+
+		<Grid.Resources>
+			<converters:GamePieceToTransformConverter x:Key="GamePieceToTransformConverter"
+			                                          TileSize="{StaticResource TileSize}"/>
+
+			<auxConverters:MultiplyConverter x:Key="MultiplyConverter"/>
+
+			<converters:YieldToFontSizeConverter x:Key="YieldToFontSizeConverter"
+			                                     FontSize="{StaticResource ProductionNumberFontSize}"
+			                                     YieldFactor="{StaticResource ProductionNumberYieldFactor}"/>
+
+			<hex:HexagonGeometry x:Key="HexagonGeometry"/>
+
+			<PathGeometry x:Key="TileGeometry">
+				<PathGeometry.Figures>
+					<PathFigure IsClosed="True"
+					            StartPoint="{Binding Corners[0], Source={StaticResource HexagonGeometry}}">
+						<LineSegment Point="{Binding Corners[1], Source={StaticResource HexagonGeometry}}"/>
+						<LineSegment Point="{Binding Corners[2], Source={StaticResource HexagonGeometry}}"/>
+						<LineSegment Point="{Binding Corners[3], Source={StaticResource HexagonGeometry}}"/>
+						<LineSegment Point="{Binding Corners[4], Source={StaticResource HexagonGeometry}}"/>
+						<LineSegment Point="{Binding Corners[5], Source={StaticResource HexagonGeometry}}"/>
+					</PathFigure>
+				</PathGeometry.Figures>
+
+				<PathGeometry.Transform>
+					<TransformGroup>
+						<ScaleTransform ScaleX="{StaticResource TileSize}" ScaleY="{StaticResource TileSize}"/>
+					</TransformGroup>
+				</PathGeometry.Transform>
+			</PathGeometry>
+
+			<EllipseGeometry x:Key="NumberTokenGeometry"
+			                 RadiusX="{StaticResource ProductionNumberSize}"
+			                 RadiusY="{StaticResource ProductionNumberSize}"/>
+
+			<LineGeometry x:Key="PathGeometry"
+			              StartPoint="{Binding Corners[5], Source={StaticResource HexagonGeometry}}"
+			              EndPoint="{Binding Corners[0], Source={StaticResource HexagonGeometry}}">
+				<LineGeometry.Transform>
+					<ScaleTransform ScaleX="{StaticResource TileSize}" ScaleY="{StaticResource TileSize}"/>
+				</LineGeometry.Transform>
+			</LineGeometry>
+
+			<geometry:RoadGeometry x:Key="RoadGeometry"
+			                       RoadWidth="{StaticResource RoadWidth}"
+			                       TileSize="{StaticResource TileSize}"/>
+
+			<PathGeometry x:Key="VillageGeometry">
+				<PathGeometry.Figures>
+					<PathFigure IsClosed="True"
+					            StartPoint="-0.4, 0.5">
+						<LineSegment Point="-0.4, -0.2"/>
+						<LineSegment Point="0, -0.5"/>
+						<LineSegment Point="0.4, -0.2"/>
+						<LineSegment Point="0.4, 0.5"/>
+					</PathFigure>
+				</PathGeometry.Figures>
+				<PathGeometry.Transform>
+					<TransformGroup>
+						<ScaleTransform ScaleX="{StaticResource VillageSize}" ScaleY="{StaticResource VillageSize}"/>
+						<TranslateTransform X="{Binding Corners[0].X, Source={StaticResource HexagonGeometry}, Converter={StaticResource MultiplyConverter}, ConverterParameter={StaticResource TileSize}}" Y="{Binding Corners[0].Y, Source={StaticResource HexagonGeometry}, Converter={StaticResource MultiplyConverter}, ConverterParameter={StaticResource TileSize}}"/>
+					</TransformGroup>
+				</PathGeometry.Transform>
+			</PathGeometry>
+
+			<PathGeometry x:Key="CityGeometry">
+				<PathGeometry.Figures>
+					<PathFigure IsClosed="True"
+					            StartPoint="-0.5, 0.25">
+						<LineSegment Point="-0.5, -0.5"/>
+						<LineSegment Point="-0.25, -0.75"/>
+						<LineSegment Point="0, -0.5"/>
+						<LineSegment Point="0, -0.25"/>
+						<LineSegment Point="0.5, -0.25"/>
+						<LineSegment Point="0.5, 0.25"/>
+					</PathFigure>
+				</PathGeometry.Figures>
+				<PathGeometry.Transform>
+					<TransformGroup>
+						<ScaleTransform ScaleX="{StaticResource CitySize}" ScaleY="{StaticResource CitySize}"/>
+						<TranslateTransform X="{Binding Corners[0].X, Source={StaticResource HexagonGeometry}, Converter={StaticResource MultiplyConverter}, ConverterParameter={StaticResource TileSize}}" Y="{Binding Corners[0].Y, Source={StaticResource HexagonGeometry}, Converter={StaticResource MultiplyConverter}, ConverterParameter={StaticResource TileSize}}"/>
+					</TransformGroup>
+				</PathGeometry.Transform>
+			</PathGeometry>
+
+			<geometry:HarborGeometry x:Key="HarborGeometry"
+			                         TileSize="{StaticResource TileSize}"/>
+
+			<Style x:Key="GamePieceStyle"
+			       TargetType="{x:Type Path}">
+				<Setter Property="RenderTransform" Value="{Binding Converter={StaticResource GamePieceToTransformConverter}}"/>
+				<Setter Property="Stroke" Value="Black"/>
+				<Setter Property="StrokeThickness" Value="{StaticResource EdgeThickness}"/>
+			</Style>
+
+			<Style x:Key="StructureStyle"
+			       BasedOn="{StaticResource GamePieceStyle}"
+			       TargetType="{x:Type Path}"/>
+
+			<DataTemplate DataType="{x:Type models:TileModel}">
+				<Grid>
+					<Canvas>
+						<Path Data="{StaticResource TileGeometry}"
+						      Fill="{Binding GameObject.TileType, Converter={StaticResource ResourceToBrushConverter}}"
+						      RenderTransform="{Binding Converter={StaticResource GamePieceToTransformConverter}}"/>
+					</Canvas>
+
+					<Canvas>
+						<Path Data="{StaticResource NumberTokenGeometry}">
+							<Path.Resources>
+								<Style BasedOn="{StaticResource GamePieceStyle}"
+								       TargetType="{x:Type Path}">
+									<Style.Setters>
+										<Setter Property="Fill" Value="White"/>
+									</Style.Setters>
+
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding GameObject.ProductionNumber}"
+										             Value="0">
+											<Setter Property="Visibility" Value="Collapsed"/>
+										</DataTrigger>
+
+										<DataTrigger Binding="{Binding IsSelected}"
+										             Value="True">
+											<Setter Property="StrokeThickness" Value="3"/>
+										</DataTrigger>
+
+										<DataTrigger Binding="{Binding IsHighlighted}"
+										             Value="True">
+											<Setter Property="Fill" Value="Gold"/>
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</Path.Resources>
+						</Path>
+
+						<Label Width="{StaticResource TileSize}"
+						       Height="{StaticResource TileSize}"
+						       HorizontalContentAlignment="Center"
+						       VerticalContentAlignment="Center"
+						       Content="{Binding GameObject.ProductionNumber}"
+						       FontSize="{Binding GameObject.Yield, Converter={StaticResource YieldToFontSizeConverter}}"
+						       FontWeight="Bold"
+						       RenderTransform="{Binding Converter={StaticResource GamePieceToTransformConverter}, ConverterParameter='Number'}">
+							<Label.Resources>
+								<Style TargetType="{x:Type Label}">
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding GameObject.ProductionNumber}"
+										             Value="0">
+											<Setter Property="Visibility" Value="Collapsed"/>
+										</DataTrigger>
+										<DataTrigger Binding="{Binding GameObject.Yield}"
+										             Value="5">
+											<Setter Property="Foreground" Value="Red"/>
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</Label.Resources>
+						</Label>
+					</Canvas>
+				</Grid>
+			</DataTemplate>
+
+			<DataTemplate DataType="{x:Type models:RobberModel}">
+				<Path Data="{StaticResource NumberTokenGeometry}"
+				      Fill="Black"
+				      RenderTransform="{Binding Converter={StaticResource GamePieceToTransformConverter}}">
+					<Path.Resources>
+						<Style BasedOn="{StaticResource GamePieceStyle}"
+						       TargetType="{x:Type Path}">
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding GameObject.Tile.ProductionNumber}"
+								             Value="0">
+									<Setter Property="Visibility" Value="Collapsed"/>
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</Path.Resources>
+				</Path>
+			</DataTemplate>
+
+			<DataTemplate DataType="{x:Type models:PathModel}">
+				<Path Data="{StaticResource PathGeometry}"
+				      Style="{StaticResource GamePieceStyle}"/>
+			</DataTemplate>
+
+			<DataTemplate x:Key="StructureTemplate"
+			              DataType="{x:Type models:IStructureModel}">
+				<Path>
+					<Path.Resources>
+						<Style BasedOn="{StaticResource StructureStyle}"
+						       TargetType="{x:Type Path}">
+							<Style.Setters>
+								<Setter Property="Fill" Value="{Binding Owner.Color, Converter={StaticResource ColorToBrushConverter}}"/>
+							</Style.Setters>
+
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding Type}"
+								             Value="{x:Type domain:Road}">
+									<Setter Property="Data" Value="{Binding Geometry, Source={StaticResource RoadGeometry}}"/>
+								</DataTrigger>
+
+								<DataTrigger Binding="{Binding Type}"
+								             Value="{x:Type domain:Village}">
+									<Setter Property="Data" Value="{DynamicResource VillageGeometry}"/>
+								</DataTrigger>
+
+								<DataTrigger Binding="{Binding Type}"
+								             Value="{x:Type domain:City}">
+									<Setter Property="Data" Value="{DynamicResource CityGeometry}"/>
+								</DataTrigger>
+
+								<DataTrigger Binding="{Binding IsSelected}"
+								             Value="True">
+									<Setter Property="StrokeThickness" Value="3"/>
+								</DataTrigger>
+
+								<DataTrigger Binding="{Binding IsHighlighted}"
+								             Value="True">
+									<Setter Property="Fill" Value="Gold"/>
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</Path.Resources>
+				</Path>
+			</DataTemplate>
+
+			<DataTemplate DataType="{x:Type models:RoadModel}">
+				<ContentPresenter Content="{Binding}"
+				                  ContentTemplate="{StaticResource StructureTemplate}"/>
+			</DataTemplate>
+
+			<DataTemplate DataType="{x:Type models:VillageModel}">
+				<ContentPresenter Content="{Binding}"
+				                  ContentTemplate="{StaticResource StructureTemplate}"/>
+			</DataTemplate>
+
+			<DataTemplate DataType="{x:Type models:CityModel}">
+				<ContentPresenter Content="{Binding}"
+				                  ContentTemplate="{StaticResource StructureTemplate}"/>
+			</DataTemplate>
+
+			<DataTemplate DataType="{x:Type models:HarborModel}">
+				<Path Data="{Binding Geometry, Source={StaticResource HarborGeometry}}"
+				      Fill="{Binding GameObject.ResourceType, Converter={StaticResource ResourceToBrushConverter}}"
+				      Style="{StaticResource GamePieceStyle}"/>
+			</DataTemplate>
+		</Grid.Resources>
+	</Grid>
+</UserControl>

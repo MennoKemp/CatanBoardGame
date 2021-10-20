@@ -1,0 +1,84 @@
+﻿<Window x:Class="CatanBoardGame.Presentation.Gui.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:numberGeneration="clr-namespace:Ludumia.NumberGeneration;assembly=Ludumia.NumberGeneration"
+        xmlns:views="clr-namespace:CatanBoardGame.Presentation.Gui.Views"
+        Title="MainWindow"
+        Width="1500"
+        Height="1000"
+        d:DataContext="{StaticResource DesignMainViewModel}"
+        WindowState="Maximized"
+        mc:Ignorable="d">
+
+	<Grid Background="LightGray">
+		<Grid.RowDefinitions>
+			<RowDefinition/>
+			<RowDefinition Height="100"/>
+		</Grid.RowDefinitions>
+
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="5"/>
+			<ColumnDefinition Width="*"/>
+		</Grid.ColumnDefinitions>
+
+		<ContentControl Content="{Binding BoardViewModel}"/>
+
+		<GridSplitter Grid.Row="0"
+		              Grid.RowSpan="2"
+		              Grid.Column="1"
+		              Width="5"
+		              HorizontalAlignment="Stretch"/>
+
+		<ContentControl Grid.Row="0"
+		                Grid.Column="2"
+		                Content="{Binding PlayerViewModel}"/>
+
+		<DockPanel Grid.Row="1"
+		           Grid.Column="0">
+			<numberGeneration:DiceControl Dice="{Binding Dice}"/>
+
+			<Button Width="100"
+			        Margin="5"
+			        Command="{Binding CancelActionCommand}"
+			        Content="Cancel"
+			        DockPanel.Dock="Right"/>
+
+			<Button Width="100"
+			        Margin="5"
+			        Command="{Binding ConfirmActionCommand}"
+			        Content="Confirm"
+			        DockPanel.Dock="Right"/>
+
+			<Border HorizontalAlignment="Center"
+			        VerticalAlignment="Center">
+				<TextBlock HorizontalAlignment="Stretch"
+				           VerticalAlignment="Stretch"
+				           FontSize="20"
+				           Text="{Binding ActionInstructions}"
+				           TextWrapping="Wrap"/>
+			</Border>
+		</DockPanel>
+
+		<ItemsControl Grid.Row="1"
+		              Grid.Column="2"
+		              ItemsSource="{Binding Actions}">
+			<ItemsControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<UniformGrid/>
+				</ItemsPanelTemplate>
+			</ItemsControl.ItemsPanel>
+
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<Button Margin="5"
+					        Command="{Binding DataContext.ExecuteActionCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+					        CommandParameter="{Binding}"
+					        Content="{Binding ActionType}"/>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl>
+	</Grid>
+</Window>

@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <AssemblyName>CatanBoardGame.Engine</AssemblyName>
+    <RootNamespace>CatanBoardGame.Engine</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\Bin\Debug</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>..\Bin\Debug</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Auxilia.Core">
+      <HintPath>..\..\Auxilia\Source\Bin\Debug\Auxilia.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Auxilia.Extensions">
+      <HintPath>..\..\Auxilia\Source\Bin\Debug\Auxilia.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Ludumia.Grids.Hexagonal">
+      <HintPath>..\..\Ludumia\Bin\Debug\Ludumia.Grids.Hexagonal.dll</HintPath>
+    </Reference>
+    <Reference Include="Ludumia.NumberGeneration">
+      <HintPath>..\..\Ludumia\Bin\Debug\Ludumia.NumberGeneration.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
